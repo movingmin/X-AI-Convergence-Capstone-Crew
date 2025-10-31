@@ -12,7 +12,8 @@
 - `mdfiles/WhatcanIdo.md`: 전체 서비스 기능 목록 및 상호 연계 그래프.
 - `mdfiles/docker-compose.md`(필요 시 신규 생성): 서비스 경계, 컨테이너 구성, Compose 초안.
 - `mdfiles/feedback.md`(필요 시 신규 생성): 회의 기록에 대한 일반 피드백.
-- `README.md`: git bash를 통해 github에 업로드하는 README.md 파일.
+- `mdfiles/serverinit.md`: 네이버 클라우드 서버 사양·견적 기록(변경 시 갱신).
+- `README.md`: 폴더 구조·협업 규칙·보안 지침을 요약한 공개용 개요 문서.
 
 ## 문서 업데이트 규칙
 - 문서 편집은 `mdfiles/` 디렉터리 내 파일을 기준으로 합니다.
@@ -22,8 +23,9 @@
 - 공통 구조나 계획이 바뀌면 `mdfiles/WhatcanIdo.md`, `mdfiles/docker-compose.md`(존재 시)를 함께 갱신합니다.
 
 ## 개발 스택 & 규칙
-- 백엔드: Django + Django REST Framework, Celery+Redis 비동기 작업, MinIO 객체 저장소.
-- 데이터베이스: MySQL 8.4 (컨테이너로 운영), 필요 시 Redis/RabbitMQ 큐 추가.
+- 백엔드: 기본 구성은 Django + Django REST Framework로 REST API를 제공하며, 장기 작업이 생기면 Celery 워커와 Redis 메시지 큐를 붙입니다.
+- 스토리지: 기본 데이터베이스는 MySQL 8.4 컨테이너입니다. 대용량 파일·모델을 저장해야 할 때 MinIO(S3 호환) 또는 객체 스토리지 대안을 도입합니다.
+- 외부 LLM: ChatGPT 등 SaaS LLM을 API로 호출하며, 프롬프트 구성·비동기 처리 가이드는 `mdfiles/AIfeedback.md`를 따릅니다.
 - 프런트엔드: Django 템플릿 혹은 React/Next.js 기반 UI(추후 선택).
 - 환경 구성: Python 3.13, `uv sync`로 종속성 정렬, Docker Compose 중심의 단일 서버(네이버 클라우드 Ubuntu 24.04) 배포.
 - 코딩 컨벤션: `open-trading-api/docs/convention.md` 준수(4 space indentation, type hints, snake_case 명명, 모듈별 docstring).
@@ -35,9 +37,12 @@
 3. AI 팀은 `mdfiles/AIfeedback.md`의 가이드를 반영해 ETL 워커·모델 추론 흐름을 준비.
 4. 웹 팀은 `mdfiles/WebFeedback.md`를 참고해 네이버 클라우드 단일 서버 기반 Docker Compose 배포 전략과 UI 뼈대를 설계.
 5. 공용 보안 정보는 `.env` 또는 `kis_devlp.yaml`(로컬 전용)에 보관하고 레포지토리에 커밋하지 않습니다.
+6. 실거래 API는 모의투자로 충분한 검증을 마친 뒤 필요한 경우에만 신청하며, 주문 한도·Fail-safe 로직을 사전에 정의합니다.
 
 ## 보안 및 운영 포인트
-- App Key/App Secret은 `kis_devlp.yaml`에만 저장하고 Git 추적에서 제외.
-- Demo 환경 우선 사용, Real 트레이딩 호출은 명시적 플래그로 제한.
-- 캐시·응답 데이터는 공유 전 정리하고, Config는 환경 변수 또는 Helper를 통해 로드.
-- Docker 이미지는 정기적으로 스캔(예: Trivy)하고 최소 권한 원칙으로 컨테이너를 실행합니다.
+- App Key/App Secret은 `.env` 또는 `kis_devlp.yaml`에만 저장하고 Git 추적에서 제외합니다.
+- Demo 환경을 기본값으로 사용하고 Real 트레이딩 호출은 명시적 플래그와 승인 절차를 거칩니다.
+- 로그·백업·공유 데이터는 개인정보와 민감 정보를 필터링한 뒤 보관·배포합니다.
+- Docker 컨테이너는 비루트 사용자와 읽기 전용 루트를 적용하고, 이미지는 Trivy 등으로 정기 스캔합니다.
+- Config는 환경 변수 또는 Helper를 통해 로드해 하드코딩을 피합니다.
+- 외부 LLM 호출 시 프롬프트와 응답을 로깅하되 민감 정보는 익명화하고, 장애 대비 폴백 응답을 준비합니다.
