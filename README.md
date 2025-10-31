@@ -20,24 +20,48 @@ AI 기반 보안 투자 최적화 시뮬레이터를 구축하는 팀 프로젝�
 - 시나리오 설계 구상: 보안 위협·시장 급변 이벤트를 LLM 기반 스크립트로 모사하는 아이디어 정리.
 
 ### 5주차
-- 인프라 전략: 네이버 클라우드 Ubuntu 24.04 서버 1대 사용, Docker 컨테이너화 → Kubernetes 관리 구조 채택.
+- 인프라 전략: 네이버 클라우드 Ubuntu 24.04 서버 1대 사용, Docker Compose 기반 컨테이너화 운영 확정.
 - 네트워크 구성: 공인 IP 및 DNS 확보 계획 수립, docker-compose 기반 개발 환경을 전제로 함.
 - AI 액션 아이템: 데이터 파이프라인 설계, MySQL 스키마 초안, 초기 데이터 적재 및 모델 후보 검증을 6주차 목표로 설정.
 
 ## 아키텍처 & 레퍼런스 문서
 - `AGENTS.md`: 프로젝트 운영 지침, 문서 역할, 개발 규칙 요약.
 - `WhatcanIdo.md`: 전체 기능 구조 및 서비스 흐름을 Mermaid 다이어그램으로 정리.
-- `WebFeedback.md`: 웹 인프라·프레임워크 선택, Docker/Kubernetes 배치 전략, DevOps 권장 스택.
+- `WebFeedback.md`: 웹 인프라·프레임워크 선택, Docker Compose 배치 전략, DevOps 권장 스택.
 - `AIfeedback.md`: 회의 기록에 대한 AI 파트 피드백과 실행 계획 보완 제안.
 - `Meeting.md`: 주차별 회의 메모(사용자 관리 문서, 열람만 권장).
+
+## 폴더 구조
+```text
+.
+├─ AGENTS.md                  # 운영 지침 및 레퍼런스 문서 안내
+├─ README.md                  # 프로젝트 소개와 협업 가이드
+├─ mdfiles/                   # 공용 정책 및 회의 관련 문서 모음
+│  ├─ Meeting.md              # 주차별 회의 메모(읽기 전용)
+│  ├─ WebFeedback.md          # 웹/인프라 피드백과 차기 액션
+│  ├─ AIfeedback.md           # AI 데이터 파이프라인·모델 제안
+│  └─ WhatcanIdo.md           # 기능 구조 및 상호 연계 그래프
+├─ open-trading-api/          # 한국투자증권 Open API 샘플 및 연동 실험 코드
+│  └─ docs/convention.md      # 코딩 컨벤션 명세
+├─ Web/                       # 웹 프런트엔드 자산(향후 React/Django 템플릿 등)
+├─ 활동일지/                  # 주차별 활동 보고서(HWP 등 비공유 산출물)
+└─ LICENSE
+```
+
+## 프로젝트 틀 & 협업 흐름
+- **단일 서버 배포**: 네이버 클라우드 Ubuntu 24.04 한 대에서 Docker Compose로 서비스를 실행합니다. 서비스 경계 및 컨테이너 정의는 `mdfiles/docker-compose.md`에 정리합니다.
+- **백엔드/AI 스택**: 기본 골격은 Django+DRF와 MySQL 8.4로 웹 서비스와 데이터 저장을 처리합니다. 필요에 따라 Celery(느린 작업을 백그라운드 워커로 분리), Redis(Celery 메시지 큐·캐시), MinIO(대용량 파일·모델 아카이브용 S3 호환 스토리지)를 붙일 수 있으며, 초기 버전에서는 생략해도 무방합니다. Open API 연동 레퍼런스는 `open-trading-api/` 디렉터리를 참고합니다.
+- **문서 동기화**: 모든 정책·피드백 문서는 `mdfiles/` 하위에서만 편집합니다. 회의록은 `mdfiles/Meeting.md`에 사용자가 직접 추가합니다.
+- **코딩 규칙과 검증**: `open-trading-api/docs/convention.md`를 준수하고, 주요 모듈에는 `chk_*.py` 형태의 실행 검증 스크립트를 배치해 `uv run python <chk_file>`로 테스트합니다.
+- **보안 운영**: 비밀 값은 `.env` 또는 `kis_devlp.yaml`에만 보관하고 Git에 올리지 않습니다. Docker 컨테이너는 읽기 전용 루트, 제한된 사용자 권한을 적용하고, Trivy 같은 도구로 이미지를 정기 검사합니다. 로그·백업에는 주민번호 등 민감 정보가 남지 않도록 필터링하고, 외부 API 호출은 데모 모드와 실거래 모드를 명확히 구분합니다.
 
 ## 다음 단계 제안
 1. 서비스 경계를 확정하고 실 토폴로지를 반영한 `docker-compose.yml` 초안을 작성합니다.
 2. Django+DRF API 스켈레톤을 컨테이너화해 Open API 연동과 기본 인증 흐름을 검증합니다.
-3. Kubernetes 매니페스트(베이스/오버레이)를 정의하고 스테이징 네임스페이스에서 리허설 배포를 진행합니다.
+3. 단일 서버용 배포 스크립트(Docker Compose 프로필, `.env`)를 정리하고 운영 절차를 문서화합니다.
 4. 프런트엔드 스택(React/Next.js 또는 Django 템플릿)을 결정하고 인증·대시보드 뼈대를 구현해 AI 모듈과 연동합니다.
 
 ## 리포지토리 구조
-- `open-trading-api/](https://github.com/koreainvestment/open-trading-api.git`: 한국투자증권 Open API 샘플 코드 및 데이터 수집 도구.
+- `open-trading-api/`: 한국투자증권 Open API 샘플 코드 및 데이터 수집 도구.
 - `활동일지/`: 주차별 활동 일지(HWP 형식).
 - 문서 루트: 진행 상황, 피드백, 구조도 등 협업 문서.
