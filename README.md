@@ -64,6 +64,6 @@ AI 기반 보안 투자 최적화 시뮬레이터를 구축하는 팀 프로젝�
 5. 실거래 API가 필요하면 모의투자 환경에서 충분히 검증한 뒤 질의·주문 한도 및 Fail-safe 로직을 마련하고 신청합니다.
 
 ## 리포지토리 구조
-- `open-trading-api/`: 한국투자증권 Open API 샘플 코드 및 데이터 수집 도구. 원본 레포지토리: <https://github.com/koreainvestment/open-trading-api>.
+- `open-trading-api/`: 한국투자증권 Open API 샘플 코드 및 데이터 수집 도구.
 - `활동일지/`: 주차별 활동 일지(HWP 형식).
 - 문서 루트: 진행 상황, 피드백, 구조도 등 협업 문서.
