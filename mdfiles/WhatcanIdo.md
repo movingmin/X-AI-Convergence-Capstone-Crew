@@ -3,31 +3,31 @@
 ```mermaid
 graph TD
     subgraph Presentation
-        A[웹 포털]
-        B[모바일/에이전트]
+        A["웹 포털"]
+        B["모바일/에이전트"]
     end
     subgraph Application Layer
-        C[인증·계정 관리]
-        D[시나리오 편집기 UI]
-        E[API 게이트웨이 (Django+DRF)]
+        C["인증·계정 관리"]
+        D["시나리오 편집기 UI"]
+        E["API 게이트웨이 (Django+DRF)"]
     end
     subgraph Intelligence & Orchestration
-        F[투자 시뮬레이터]
-        G[위협 대응 전략 엔진]
-        H[AI 추천 엔진]
-        I[Celery 워커·LLM 오케스트레이터]
-        J[ETL 워커 (open-trading-api)]
+        F["투자 시뮬레이터"]
+        G["위협 대응 전략 엔진"]
+        H["AI 추천 엔진"]
+        I["Celery 워커·LLM 오케스트레이터"]
+        J["ETL 워커 (open-trading-api)"]
     end
     subgraph Data Layer
-        K[(MySQL 사용자·거래 DB)]
-        L[(시뮬레이션 로그/리포트)]
-        M[(MinIO 모델·오브젝트 저장소)]
-        N[(모니터링 스택)]
+        K["MySQL 사용자·거래 DB"]
+        L["시뮬레이션 로그/리포트"]
+        M["MinIO 모델·오브젝트 저장소"]
+        N["모니터링 스택"]
     end
     subgraph External Services
-        O[한국투자증권 Open API]
-        P[뉴스·재무 데이터]
-        Q[ChatGPT 등 외부 LLM]
+        O["한국투자증권 Open API"]
+        P["뉴스·재무 데이터"]
+        Q["ChatGPT 등 외부 LLM"]
     end
     A --> C
     B --> C
