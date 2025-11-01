@@ -31,30 +31,30 @@ flowchart LR
         Q["ChatGPT 등 외부 LLM"]
     end
 
-    K <--> F
-    K <--> G
-    L <--> F
-    L <--> G
-    M <--> H
-    N <--> I
-    J --> K
-    J --> L
-    J --> M
-    I --> F
-    I --> G
-    I --> H
-    F <--> E
-    G <--> E
-    H <--> E
-    D <--> F
-    C <--> I
-    C <--> H
-    E <--> C
-    A <--> C
-    B <--> C
-    O --> J
-    P --> H
-    Q --> I
+    K --- F
+    K --- G
+    L --- F
+    L --- G
+    M --- H
+    N --- I
+    J --- K
+    J --- L
+    J --- M
+    I --- F
+    I --- G
+    I --- H
+    F --- E
+    G --- E
+    H --- E
+    D --- F
+    C --- I
+    C --- H
+    E --- C
+    A --- C
+    B --- C
+    O --- J
+    P --- H
+    Q --- I
 ```
 
 ## 기능 모듈 및 책임
