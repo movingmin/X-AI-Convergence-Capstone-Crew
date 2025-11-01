@@ -11,11 +11,11 @@ graph TD
         D["시나리오 편집기 UI"]
         E["API 게이트웨이 (Django+DRF)"]
     end
-    subgraph 지능_및_오케스트레이션_계층
+    subgraph 지능_및_자동처리_계층
         F["투자 시뮬레이터"]
         G["위협 대응 전략 엔진"]
         H["AI 추천 엔진"]
-        I["Celery 워커·LLM 오케스트레이터"]
+        I["Celery 워커·LLM 자동 처리"]
         J["데이터 수집 워커 (open-trading-api)"]
     end
     subgraph 데이터_계층
@@ -72,11 +72,12 @@ graph TD
 - 이렇게 나누면 LLM이 느리거나 실패해도 메인 추천은 계속 돌아가고, 워커가 재시도·폴백 메시지를 처리해 안정성이 높아집니다.
 - 정리하면 “AI 추천 엔진 = 우리 안의 두뇌”, “외부 LLM = 설명을 도와주는 조수” 구조로 이해하면 됩니다.
 - **데이터 수집 워커(ETL)**는 반복적으로 한국투자증권 API를 호출해 데이터를 모으는 자동화 스크립트입니다. 초기엔 직접 실행하면서 검증하고, 나중에 Celery로 돌리면 손이 덜 갑니다.
+- **Celery 자동 처리 흐름(예전 '오케스트레이션')**은 여러 작업을 순서대로 연결해 주는 조정자입니다. “데이터 모으기 → 점수 계산 → LLM 설명”처럼 해야 할 일을 순서대로 실행해 준다고 이해하면 됩니다.
 
 ## 단계별 실행 로드맵
 
-1. **Compose 경계 확정**: `web-frontend`, `api-gateway`, `ai-orchestrator`, `etl-worker`, `mysql`, `redis`, `minio`, `monitoring` 컨테이너 정의와 환경 변수·볼륨 정책을 `mdfiles/docker-compose.md`에 반영합니다.
+1. **Compose 경계 확정**: `web-frontend`, `api-gateway`, `ai-processor`, `etl-worker`, `mysql`, `redis`, `minio`, `monitoring` 컨테이너 정의와 환경 변수·볼륨 정책을 `mdfiles/docker-compose.md`에 반영합니다.
 2. **Django/DRF 스켈레톤 구축**: 인증 흐름, 시나리오 CRUD, OpenAPI 문서를 제공하고, Celery·Redis 연계를 위한 초기 설정을 마련합니다.
-3. **AI 오케스트레이션**: Celery 비동기 작업으로 한국투자증권 API 데이터 적재, ChatGPT 분석, 위협 대응 룰 평가를 구현하고 로그/토큰 사용량을 추적합니다.
+3. **AI 자동 처리 흐름 구축**: Celery 비동기 작업으로 한국투자증권 API 데이터 적재, ChatGPT 분석, 위협 대응 룰 평가를 구현하고 로그/토큰 사용량을 추적합니다.
 4. **프런트엔드 및 대시보드**: 인증 연동 UI, 시나리오 편집기, 시뮬레이션/위협 리포트 뷰어, 모니터링 패널을 단계적으로 추가하고, 실시간 알림(Channels/WebSocket)을 검토합니다.
 5. **보안·운영 체계**: .env 비밀 관리, 주문 Fail-safe, 주기 백업·스냅샷, 장애 대응 체크리스트를 문서화해 단일 서버 운영 리스크를 최소화합니다.
