@@ -29,6 +29,7 @@
  - 컴퓨터 총 가격: 464,204원
  
 ## 3. Cloud DB for MySQL (Managed)
+
 플랫폼 타입: VPC
 서버 세대: G3
 서버 타입: Standard
