@@ -1,16 +1,13 @@
 # 전체 기능 구조 개요
 
 ```mermaid
-%%{init: {"flowchart": {"curve": "step", "nodeSpacing": 40, "rankSpacing": 55}}}%%
+%%{init: {"flowchart": {"curve": "step", "nodeSpacing": 45, "rankSpacing": 60}}}%%
 flowchart LR
-    subgraph 사용자_표현_계층
-        A["웹 포털"]
-        B["모바일/에이전트"]
-    end
-    subgraph 애플리케이션_계층
-        C["인증·계정 관리"]
-        D["시나리오 편집기 UI"]
-        E["API 게이트웨이\n(Django+DRF)"]
+    subgraph 데이터_계층
+        K["MySQL 사용자·거래 DB"]
+        L["시뮬레이션 로그·리포트"]
+        M["MinIO 모델·오브젝트 저장소"]
+        N["모니터링 스택"]
     end
     subgraph 지능_및_자동처리_계층
         F["투자 시뮬레이터"]
@@ -19,11 +16,14 @@ flowchart LR
         I["Celery 자동 처리"]
         J["데이터 수집 워커\n(open-trading-api)"]
     end
-    subgraph 데이터_계층
-        K["MySQL 사용자·거래 DB"]
-        L["시뮬레이션 로그·리포트"]
-        M["MinIO 모델·오브젝트 저장소"]
-        N["모니터링 스택"]
+    subgraph 애플리케이션_계층
+        C["인증·계정 관리"]
+        D["시나리오 편집기 UI"]
+        E["API 게이트웨이\n(Django+DRF)"]
+    end
+    subgraph 사용자_표현_계층
+        A["웹 포털"]
+        B["모바일/에이전트"]
     end
     subgraph 외부_연동_서비스
         O["한국투자증권 Open API"]
@@ -31,27 +31,27 @@ flowchart LR
         Q["ChatGPT 등 외부 LLM"]
     end
 
-    A --> C
-    B --> C
-    C --> D
-    C --> E
-    D --> F
-    E --> F
-    F --> H
-    H --> G
-    F --> L
-    G --> L
-    H --> M
-    I --> F
-    I --> H
-    I --> G
+    K --> F
+    K --> G
+    L --> F
+    M --> H
+    N --> I
     J --> K
     J --> L
     J --> M
-    I --> M
-    C --> K
-    E --> N
-    I --> N
+    I --> F
+    I --> G
+    I --> H
+    F --> E
+    G --> E
+    H --> E
+    D --> F
+    C --> I
+    C --> H
+    E --> C
+    A --> C
+    A --> D
+    B --> C
     O --> J
     P --> H
     Q --> I
