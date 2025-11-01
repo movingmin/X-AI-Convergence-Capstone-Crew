@@ -1,7 +1,8 @@
 # 전체 기능 구조 개요
 
 ```mermaid
-graph TD
+%%{init: {"flowchart": {"curve": "step", "nodeSpacing": 40, "rankSpacing": 55}}}%%
+flowchart LR
     subgraph 사용자_표현_계층
         A["웹 포털"]
         B["모바일/에이전트"]
@@ -9,18 +10,18 @@ graph TD
     subgraph 애플리케이션_계층
         C["인증·계정 관리"]
         D["시나리오 편집기 UI"]
-        E["API 게이트웨이 (Django+DRF)"]
+        E["API 게이트웨이\n(Django+DRF)"]
     end
     subgraph 지능_및_자동처리_계층
         F["투자 시뮬레이터"]
         G["위협 대응 전략 엔진"]
         H["AI 추천 엔진"]
-        I["Celery 워커·LLM 자동 처리"]
-        J["데이터 수집 워커 (open-trading-api)"]
+        I["Celery 자동 처리"]
+        J["데이터 수집 워커\n(open-trading-api)"]
     end
     subgraph 데이터_계층
         K["MySQL 사용자·거래 DB"]
-        L["시뮬레이션 로그/리포트"]
+        L["시뮬레이션 로그·리포트"]
         M["MinIO 모델·오브젝트 저장소"]
         N["모니터링 스택"]
     end
@@ -29,28 +30,29 @@ graph TD
         P["뉴스·재무 데이터"]
         Q["ChatGPT 등 외부 LLM"]
     end
+
     A --> C
     B --> C
+    C --> D
     C --> E
-    E --> D
     D --> F
+    E --> F
     F --> H
     H --> G
-    G --> L
     F --> L
-    C --> K
-    E --> K
+    G --> L
+    H --> M
     I --> F
-    I --> G
     I --> H
+    I --> G
     J --> K
     J --> L
-    H --> M
+    J --> M
     I --> M
-    N --> E
-    N --> I
+    C --> K
+    E --> N
+    I --> N
     O --> J
-    O --> F
     P --> H
     Q --> I
 ```
