@@ -39,6 +39,9 @@
   - 네이버 클라우드 서버 사양 및 비용 추적, 공인 IP/DNS 관리
   - Docker Compose로 단일 서버 운영, Trivy 스캔·비루트 사용자·읽기 전용 루트 적용
   - 로그·백업 정책 수립, 주간 점검 항목을 `mdfiles/feedback.md` 또는 전용 문서에 기록
+  - Database: Cloud DB for MySQL (vCPU 2/8GB, 200GB CB2 + 50GB 백업)을 시나리오/위험 지표·LLM 토큰 사용량 저장소로 운영하고, 주간 스냅샷과 복구 문서(`docs/recovery.md`) 준비를 책임집니다.
+  - Compute: G3 Standard 서버 (vCPU 4/16GB, 512GB SSD, Ubuntu 24.04)에서 Compose 묶음(api-gateway, web-frontend, Celery 워커/비트, MinIO, 모니터링)을 상시 가동하며, 로그·모델 캐시 디스크 용량을 관리합니다.
+  - Networking: 단일 공인 IP와 Private Subnet을 관리해 HTTPS 게이트웨이를 노출하고 DB/Redis/MinIO를 내부망에 격리하며, 월 200GB 전송량과 보안그룹/TLS 정책을 점검합니다.
 
 ## 개발 스택 & 협업 규칙
 - Python 3.13 + `uv sync` 고정, Django REST Framework, Celery, Redis, MySQL 8.4, MinIO

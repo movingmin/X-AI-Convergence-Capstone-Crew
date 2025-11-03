@@ -61,6 +61,12 @@ AI 기반 보안 투자 최적화 시뮬레이터를 설계하는 프로젝트�
 - 장애 대비 폴백 응답, 토큰 사용량 모니터링, 주기적 백업 절차를 유지합니다.
 - 서버 사양·예산, 복구 절차 등 운영 메모는 `mdfiles/serverinit.md`, `mdfiles/server.md`, `mdfiles/serverfeedback.md`를 통해 최신 상태로 관리하며 제안/확정안을 구분합니다.
 
+## Infrastructure Snapshot (2025-11-03)
+- **Database:** Cloud DB for MySQL (vCPU 2, RAM 8GB, 200GB CB2 + 50GB 백업)은 시나리오/위험 지표/주문 로그와 LLM 토큰 사용량 테이블을 단일 소스 오브 트루스로 유지하며, 주간 스냅샷을 통한 복구 계획을 뒷받침합니다.
+- **Compute:** G3 Standard 서버 (vCPU 4, RAM 16GB, 512GB SSD, Ubuntu 24.04)는 Docker Compose 묶음(api-gateway, web-frontend, Celery 워커/비트, MinIO, 모니터링)을 수용하여 DRF API와 ETL/AI 태스크를 동시에 운영합니다.
+- **Networking:** 단일 공인 IP + Private Subnet 구성은 HTTPS 게이트웨이를 외부에 공개하면서 DB/Redis/MinIO를 내부망으로 격리하고, 월 200GB 할당량으로 모의투자 API, 대시보드, LLM 콜백 트래픽을 감당합니다.
+- **Budget:** 세 리소스의 월 총비용은 약 462,014원으로 Demo 환경 예산(월 50만 원 이내)에 부합합니다. 세부 로그는 `mdfiles/serverfeedback.md`에 기록합니다.
+
 ## Reference Documents
 - `mdfiles/WhatcanIdo.md`: 전체 아키텍처와 기능 모듈 관계를 Mermaid로 정리
 - `mdfiles/WebFeedback.md`: 프런트엔드/인프라 작업 우선순위와 Compose 운영 가이드
