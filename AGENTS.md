@@ -1,51 +1,66 @@
-# 작업 개요 및 안내
+# 작업 지침 요약
 
-## 프로젝트 전반
-- 주제: AI 기반 보안 투자 최적화 시뮬레이터 구축
-- 핵심 구성: `open-trading-api` 기반 데이터 수집·시뮬레이션, 웹 대시보드, 위협 대응 전략 모듈
-- 전체 기능 구조 및 흐름: `mdfiles/WhatcanIdo.md`의 Mermaid 그래프 참조
+## 프로젝트 개요
+- 미션: AI 기반 보안 투자 최적화 시뮬레이터 구축
+- 핵심 축: 한국투자증권 `open-trading-api` 데이터 → Django/DRF API → 대시보드 UI → AI 추천·위협 대응 엔진
+- 전체 흐름: `mdfiles/WhatcanIdo.md`의 Mermaid 다이어그램과 단계별 로드맵을 기준으로 진행
 
-## 문서 체계
-- `README.md`: 공개용 개요, 협업 규칙, 보안 지침 요약
-- `AGENTS.md`: 에이전트/팀원의 상세 업무 기준과 문서 편집 규칙
-- `mdfiles/Meeting.md`: 주간 회의 메모 (사용자 직접 관리, 열람만)
-- `mdfiles/WebFeedback.md`: 웹/인프라 관련 피드백과 차기 액션
-- `mdfiles/AIfeedback.md`: AI API, 데이터 파이프라인, 모델 관련 피드백
-- `mdfiles/WhatcanIdo.md`: 전체 기능 목록 및 상호 연계 다이어그램
-- `mdfiles/docker-compose.md` (필요 시 생성): 서비스 경계, 컨테이너 구성, Compose 초안
-- `mdfiles/feedback.md` (필요 시 생성): 회의 내용 외 일반 피드백
-- `mdfiles/serverinit.md`: 네이버 클라우드 서버 사양 및 견적 기록
+## 문서 및 기록 관리
+- `README.md`: 공개용 프로젝트 개요, 협업 규칙, 핵심 보안 정책 요약
+- `AGENTS.md`: 본 문서. 에이전트/팀원의 역할, 문서 편집 규범, 운영 절차 정리
+- `mdfiles/Meeting.md`: 주간 회의 기록. 에이전트는 열람만, 수정 금지
+- `mdfiles/WebFeedback.md`: 웹/인프라 변경사항, Compose 운영 메모
+- `mdfiles/AIfeedback.md`: AI 파이프라인, LLM 운용, 데이터 품질 피드백
+- `mdfiles/WhatcanIdo.md`: 기능 구조와 책임 구역 한눈에 보기
+- `mdfiles/serverinit.md`: 네이버 클라우드 서버 스펙·비용 산정 원본
+- `mdfiles/server.md`: 최신 예산(월 50만 원대) 기준 서버 구성안
+- `mdfiles/serverfeedback.md`: 서버 구성 피드백 및 예산 전략
+- `mdfiles/docker-compose.md`, `mdfiles/feedback.md`: 필요 시 생성해 Compose 설계 또는 일반 피드백 기록
+- 로컬 비밀 문서: `mdfiles/open-trading-api.md`는 `.gitignore`에 포함되어 있으며, API 키·시크릿은 여기에 기록하지 말고 `.env` 혹은 `kis_devlp.yaml`에서 환경 변수로 관리
 
 ## 문서 편집 규칙
-- 정책·피드백 문서는 반드시 `mdfiles/` 하위에서만 수정합니다.
-- 회의 내용은 `mdfiles/Meeting.md`에 팀원이 직접 기록하며, 에이전트는 편집하지 않습니다.
-- 웹 관련 변경사항은 `mdfiles/WebFeedback.md`, AI 관련 변경사항은 `mdfiles/AIfeedback.md`에 정리합니다.
-- 서비스 경계나 공통 구조가 바뀌면 `mdfiles/WhatcanIdo.md`와 `mdfiles/docker-compose.md`(존재 시)를 함께 갱신합니다.
-- README/AGENTS는 공개 가이드와 내부 운영 기준을 요약하는 용도로 유지합니다.
+- 정책·피드백 문서는 반드시 `mdfiles/` 하위에서만 수정하고, 회의 메모는 담당자만 갱신
+- 서비스 구조 변경 시 `mdfiles/WhatcanIdo.md`와 `mdfiles/docker-compose.md`(존재 시)를 함께 업데이트
+- 웹/인프라 변경은 `mdfiles/WebFeedback.md`, AI/데이터 변경은 `mdfiles/AIfeedback.md`에 기록 후 공유
+- README/AGENTS는 외부 공지 및 공통 운영 기준을 압축한 버전으로 유지하며, 상세한 근거는 `mdfiles/` 문서에 남긴다
 
-## 개발 스택 & 규칙
-- 백엔드: Django 5 + Django REST Framework, 필요 시 Celery 워커와 Redis 메시지 큐 확장
-- 데이터/스토리지: MySQL 8.4 컨테이너, 대용량 파일·모델은 MinIO(S3 호환) 또는 객체 스토리지 사용
-- 프런트엔드: Django 템플릿 기반 MVP → 필요 시 Vite+React/Next.js로 분리
-- 외부 LLM: ChatGPT 등 SaaS LLM API 사용, 프롬프트 구성·비동기 처리 가이드는 `mdfiles/AIfeedback.md` 준수
-- 환경 구성: Python 3.13, `uv sync`로 종속성 정렬, Docker Compose 기반 단일 서버(네이버 클라우드 Ubuntu 24.04) 운영
-- 코딩 컨벤션: `open-trading-api/docs/convention.md` 명세(4 space indentation, type hints, snake_case, 모듈 docstring) 준수
-- 테스트: 각 실행 샘플에 `chk_*.py` 유지, `uv run python path/to/chk_example.py`로 검증
+## 역할별 책임 정리
+- **웹 & 인프라 팀** (`mdfiles/WebFeedback.md` 참고)
+  - Django 5 + DRF API 게이트웨이, 인증/RBAC, 시나리오 CRUD 유지
+  - Django 템플릿 기반 MVP → 필요 시 Vite+React 분리, API 스키마는 DRF Spectacular로 자동화
+  - Compose 서비스( `api-gateway`, `web-frontend`, `static-nginx`, `monitoring` ) 정의 및 릴리스/모니터링 파이프라인 구축
+  - 테스트 스크립트 `chk_api.py`, `chk_front.py` 유지, 보안 설정(CSRF, HTTPS, `SECURE_*`) 검증
+- **AI & 데이터 팀** (`mdfiles/AIfeedback.md` 참고)
+  - Celery 워커/비트, Redis, ETL 파이프라인(`open-trading-api` 래핑) 설계
+  - 위험 점수·추천 모델, LLM 호출, MinIO 버킷 구조(`reports`, `models`, `prompts`) 운영
+  - `chk_ai.py`, `chk_etl.py`, `chk_llm.py` 테스트 지표 유지 및 주간 품질 리포트 작성
+  - 토큰 사용량·오류 모니터링, 실패 재시도/폴백 전략, 모델 버전 관리 문서화
+- **공통 운영** (`mdfiles/serverinit.md`, `mdfiles/server.md`, `mdfiles/serverfeedback.md` 참고)
+  - 네이버 클라우드 서버 사양 및 비용 추적, 공인 IP/DNS 관리
+  - Docker Compose로 단일 서버 운영, Trivy 스캔·비루트 사용자·읽기 전용 루트 적용
+  - 로그·백업 정책 수립, 주간 점검 항목을 `mdfiles/feedback.md` 또는 전용 문서에 기록
 
-## 권장 작업 흐름
-1. `mdfiles/docker-compose.md` 설계를 참고해 서비스별 Dockerfile과 Compose 환경 정의
-2. Django+DRF API 스켈레톤을 컨테이너화해 인증·Open API 연동 검증
-3. `open-trading-api` 스크립트를 Celery 태스크로 래핑해 데이터 적재 파이프라인 구성
-4. 웹 팀은 `mdfiles/WebFeedback.md` 지침에 따라 대시보드/UI 뼈대 설계 및 배포 전략 수립
-5. AI 팀은 `mdfiles/AIfeedback.md` 가이드를 기반으로 ETL 워커·모델 추론 흐름 구현
-6. 공용 보안 정보는 `.env` 또는 `kis_devlp.yaml`(로컬 전용)에만 저장하고 Git 추적에서 제외
-7. 실거래 API 사용은 모의투자 환경에서 충분히 검증한 뒤 주문 한도·Fail-safe 로직을 선행 정의
+## 개발 스택 & 협업 규칙
+- Python 3.13 + `uv sync` 고정, Django REST Framework, Celery, Redis, MySQL 8.4, MinIO
+- 프런트: Django 템플릿 → 필요 시 Vite+React/TypeScript, Chart.js 혹은 ECharts
+- 외부 LLM: ChatGPT API 사용, 프롬프트/응답 로깅은 민감 정보 마스킹 후 MinIO 저장
+- 코딩 컨벤션: `open-trading-api/docs/convention.md`(4-space, type hints, snake_case, 모듈 docstring)
+- 모든 주요 실행 예시는 `chk_*.py` 형태의 검증 스크립트로 유지, `uv run python path/to/chk_example.py`
+- CI 기본: `ruff`, `pytest`, (React 사용 시) `npm test`, Docker 이미지 빌드
 
-## 보안 및 운영 정책
-- App Key/App Secret 등 비밀 값은 `.env` 또는 `kis_devlp.yaml`에만 저장하며 버전관리에서 제외합니다.
-- 기본 실행 모드는 Demo/모의투자이며, Real 트레이딩 호출은 명시적 플래그와 승인 절차를 거칩니다.
-- 로그·백업·공유 데이터는 개인정보·민감 정보를 필터링한 뒤 저장·배포합니다.
-- Docker 컨테이너는 비루트 사용자와 읽기 전용 루트를 적용하고, 이미지는 Trivy 등으로 정기 스캔합니다.
-- Config는 환경 변수 또는 Helper를 통해 로드해 하드코딩을 피합니다.
-- 외부 LLM 호출 시 프롬프트·응답을 로깅하되 민감 정보는 익명화하고, 장애 대비 폴백 응답을 준비합니다.
-- Celery 워커/비트 헬스체크, 토큰 사용량 모니터링, 주기적 백업·스냅샷 정책을 유지합니다.
+## 운영 및 보안 정책
+- 기본 실행 모드는 Demo/모의투자. 실거래 호출은 별도 플래그와 승인 절차, Fail-safe 로직(주문 한도/중단 조건) 수립 후 진행
+- 비밀 값(App Key/Secret 등)은 `.env` 또는 `kis_devlp.yaml`에만 저장하고 Git 추적 금지. 필요 시 비밀 공유는 암호화된 채널 사용
+- 로그·백업·공유 데이터는 민감 정보 필터링 후 저장. LLM 프롬프트/응답은 익명화, 토큰 사용량은 MySQL `llm_usage`에 기록
+- Celery 워커/비트 헬스체크, 큐 길이·실패 태스크 모니터링, 주기적 백업·스냅샷 정책 유지
+- Docker 컨테이너는 비루트 사용자, 읽기 전용 루트 적용. 이미지 스캔은 Trivy 등으로 정기 수행
+- 장애 대비: LLM 실패 폴백, 데이터 복구 절차(`docs/recovery.md` 예정), 모니터링 알림(Slack/Email) 연동
+- 서버 사양·예산 및 운영 변경 사항은 `mdfiles/serverinit.md`, `mdfiles/server.md`, `mdfiles/serverfeedback.md`에서 추적
+
+## 작업 순서 가이드
+1. `mdfiles/docker-compose.md` 초안 확정 후 서비스별 Dockerfile 및 배포 스크립트 정리
+2. Django+DRF 스켈레톤과 인증, OpenAPI 문서화, Celery/Redis 연동 검증
+3. `open-trading-api` ETL 태스크와 MySQL/MinIO 적재 라인 구축, 실패 재시도·알림 연결
+4. 대시보드/시각화 MVP 제작, React 전환 여부 결정, 공통 디자인 시스템 확립
+5. LLM 호출 로그·폴백 설계, 토큰 사용량 모니터링, 백업·스냅샷·재해 복구 문서화
+6. 주간 회의 메모, 웹/AI 피드백 문서 업데이트로 진행 상황 공유
