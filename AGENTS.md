@@ -13,8 +13,8 @@
 - `mdfiles/AIfeedback.md`: AI 파이프라인, LLM 운용, 데이터 품질 피드백
 - `mdfiles/WhatcanIdo.md`: 기능 구조와 책임 구역 한눈에 보기
 - `mdfiles/serverinit.md`: 네이버 클라우드 서버 스펙·비용 산정 원본
-- `mdfiles/server.md`: 최신 예산(월 50만 원대) 기준 서버 구성안
-- `mdfiles/serverfeedback.md`: 서버 구성 피드백 및 예산 전략
+- `mdfiles/server.md`: 확정된 서버 구성 및 현재 운영 예산
+- `mdfiles/serverfeedback.md`: 서버 구성 제안·비용 절감 피드백 기록
 - `mdfiles/docker-compose.md`, `mdfiles/feedback.md`: 필요 시 생성해 Compose 설계 또는 일반 피드백 기록
 - 로컬 비밀 문서: `mdfiles/open-trading-api.md`는 `.gitignore`에 포함되어 있으며, API 키·시크릿은 여기에 기록하지 말고 `.env` 혹은 `kis_devlp.yaml`에서 환경 변수로 관리
 
@@ -55,7 +55,7 @@
 - Celery 워커/비트 헬스체크, 큐 길이·실패 태스크 모니터링, 주기적 백업·스냅샷 정책 유지
 - Docker 컨테이너는 비루트 사용자, 읽기 전용 루트 적용. 이미지 스캔은 Trivy 등으로 정기 수행
 - 장애 대비: LLM 실패 폴백, 데이터 복구 절차(`docs/recovery.md` 예정), 모니터링 알림(Slack/Email) 연동
-- 서버 사양·예산 및 운영 변경 사항은 `mdfiles/serverinit.md`, `mdfiles/server.md`, `mdfiles/serverfeedback.md`에서 추적
+- 서버 사양·예산 및 운영 변경 사항은 `mdfiles/serverinit.md`, `mdfiles/server.md`, `mdfiles/serverfeedback.md`에서 추적하며, 제안과 확정안을 구분해 기록
 
 ## 작업 순서 가이드
 1. `mdfiles/docker-compose.md` 초안 확정 후 서비스별 Dockerfile 및 배포 스크립트 정리

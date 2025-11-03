@@ -32,8 +32,8 @@ AI 기반 보안 투자 최적화 시뮬레이터를 설계하는 프로젝트�
 │  ├─ Meeting.md            # 회의 메모(사용자 편집 전용)
 │  ├─ WebFeedback.md        # 웹/인프라 피드백과 다음 단계
 │  ├─ WhatcanIdo.md         # 전체 기능 구조와 Mermaid 그래프
-│  ├─ server.md             # 월 50만 원대 기준 서버 구성안
-│  ├─ serverfeedback.md     # 서버 구성 피드백 및 예산 전략
+│  ├─ server.md             # 확정된 서버 구성 및 예산
+│  ├─ serverfeedback.md     # 서버 구성/비용 최적화 제안 및 논의
 │  └─ serverinit.md         # 네이버 클라우드 서버 사양·견적
 ├─ open-trading-api/        # 한국투자증권 Open API 연동 실험(샘플 코드 위치)
 └─ 활동일지/                # 비공개 활동 보고서 아카이브
@@ -45,7 +45,7 @@ AI 기반 보안 투자 최적화 시뮬레이터를 설계하는 프로젝트�
 - **문서 업데이트**: 모든 정책·피드백 문서는 `mdfiles/`에서만 수정합니다. 회의록은 `mdfiles/Meeting.md`에 팀원이 직접 기록합니다.
 - **운영 지침**: 역할, 문서 편집 규칙, 보안 정책은 `AGENTS.md`를 기준으로 유지하고, 세부 근거는 각 `mdfiles/*.md`에 기록합니다.
 - **코딩 컨벤션**: `open-trading-api/docs/convention.md` 명세(추가 예정)에 따라 4 space indentation, 타입 힌트, snake_case를 적용합니다.
-- **작업 분리**: 웹 팀은 `mdfiles/WebFeedback.md`, AI 팀은 `mdfiles/AIfeedback.md`, 서버/예산 이슈는 `mdfiles/server.md`와 `mdfiles/serverfeedback.md`를 갱신해 변경 사항을 공유합니다.
+- **작업 분리**: 웹 팀은 `mdfiles/WebFeedback.md`, AI 팀은 `mdfiles/AIfeedback.md`, 서버/예산 이슈는 `mdfiles/server.md`(확정안)와 `mdfiles/serverfeedback.md`(제안/피드백)를 나눠 갱신합니다.
 - **개발 환경**: Python 패키지는 `uv sync`, Node 기반 자산은 선택된 프레임워크 빌드 도구를 사용합니다. 서비스별 Dockerfile/Compose 정의는 `mdfiles/docker-compose.md`(필요 시 생성)에 정리합니다.
 - **테스트 & 검증**: 주요 컴포넌트마다 `chk_*.py` 스크립트를 추가하고 CI에서 `uv run python`으로 실행합니다.
 
@@ -59,15 +59,15 @@ AI 기반 보안 투자 최적화 시뮬레이터를 설계하는 프로젝트�
 - Docker 컨테이너는 비루트 사용자·읽기 전용 루트를 채택하고 Trivy 등으로 이미지를 정기 스캔합니다.
 - 로그·백업은 개인정보를 필터링하여 저장하며, 외부 LLM 프롬프트와 응답은 민감 정보 익명화 후 보관합니다.
 - 장애 대비 폴백 응답, 토큰 사용량 모니터링, 주기적 백업 절차를 유지합니다.
-- 서버 사양·예산, 복구 절차 등 운영 메모는 `mdfiles/serverinit.md`, `mdfiles/server.md`, `mdfiles/serverfeedback.md`를 통해 최신 상태로 관리합니다.
+- 서버 사양·예산, 복구 절차 등 운영 메모는 `mdfiles/serverinit.md`, `mdfiles/server.md`, `mdfiles/serverfeedback.md`를 통해 최신 상태로 관리하며 제안/확정안을 구분합니다.
 
 ## Reference Documents
 - `mdfiles/WhatcanIdo.md`: 전체 아키텍처와 기능 모듈 관계를 Mermaid로 정리
 - `mdfiles/WebFeedback.md`: 프런트엔드/인프라 작업 우선순위와 Compose 운영 가이드
 - `mdfiles/AIfeedback.md`: 데이터 파이프라인, 모델 워크플로, LLM 활용 전략
 - `mdfiles/serverinit.md`: 네이버 클라우드 서버 구성 및 비용 산정
-- `mdfiles/server.md`: 월 50만 원대 목표로 조정한 서버 비용 플랜
-- `mdfiles/serverfeedback.md`: 서버 구성 피드백, 예산 최적화 전략, 운영 체크포인트
+- `mdfiles/server.md`: 확정된 서버 구성과 예산
+- `mdfiles/serverfeedback.md`: 서버 구성 피드백, 비용 절감 제안, 운영 체크포인트
 - `AGENTS.md`: 문서 역할, 개발 규칙, 보안 정책 세부 지침
 
 ## Near-Term Focus
