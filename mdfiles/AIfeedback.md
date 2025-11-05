@@ -38,6 +38,21 @@
 4. 주간 점검: 오브젝트 스토리지 용량, 토큰 사용량, API 한도, 실패 로그를 리뷰하고 `mdfiles/AIfeedback.md`에 주요 변경사항을 기록합니다.
 5. 재해 복구: MinIO와 MySQL 덤프를 하루 1회 스냅샷으로 남기고, 복구 절차 문서를 `docs/recovery.md`로 유지합니다.
 
+## 2025-11-05 Celery/Redis/ETL 연동 플랜
+- **목표**: Redis 브로커 기반 Celery 워커·비트 스켈레톤을 구성하고 `open-trading-api` 래핑 ETL 태스크까지 연결해 기본 파이프라인을 한 번 돌려본다.
+- **현황 메모**: Redis는 Docker로 기동된 상태. Django/DRF 스켈레톤과 루트 `pyproject.toml`은 아직 없으므로 오늘 환경 정비부터 착수한다.
+- **작업 1 – uv 루트 환경 정비**: 레포지토리 루트에 공용 `pyproject.toml`을 추가해 Django, Celery, Redis, MySQL, MinIO, 데이터 처리, 테스트 패키지까지 명시하고 `uv sync --all-extras`로 `.venv` 생성. `.gitignore`에 `.venv/`와 `uv.lock` 반영. `open-trading-api` 패키지를 develop 모드로 연결.
+- **작업 2 – Django 설정과 Celery 통합**: `config/celery.py`와 `config/__init__.py`에 Celery 인스턴스를 선언하고 Redis 브로커/백엔드 URL을 환경 변수(`REDIS_URL`)에서 읽도록 구성. Django 설정에 `CELERY_TASK_ROUTES`, `CELERY_TIMEZONE`, `CELERY_TASK_DEFAULT_QUEUE="ai_tasks"` 등 기본 옵션을 추가하고, `celery[redis]`, `django-environ`을 활용해 설정 파일 분리.
+- **작업 3 – 워커/비트 엔트리포인트**: `manage.py` 수준에서 `uv run celery -A config worker`를 실행할 수 있도록 `celery_app = Celery("ai_processor")` 구조를 맞추고, `scripts/run_worker.sh`, `scripts/run_beat.sh` 초안을 작성. Docker Compose 초안이 나오면 바로 연결할 수 있게 문서화.
+- **작업 4 – Redis 접속 검증**: `.env.example`에 `REDIS_URL=redis://localhost:6379/0`를 추가하고, Celery에서 PING 태스크(`debug_ping.delay()`)로 연결 테스트. Docker Redis 컨테이너는 `redis:7-alpine` 태그로 통일하고, 향후 비밀번호 설정/퍼시스턴스 옵션 검토.
+- **작업 5 – ETL 파이프라인 스켈레톤**: `ai_pipeline/etl/market_ingest.py` 모듈 생성 후 (1) `kis_authenticate`, (2) 시세/체결/주문 API 호출, (3) pandas 정규화 → MySQL 업서트, (4) MinIO 업로드 단계를 Celery 태스크로 분리. 실패 시 `tenacity` 재시도와 Slack 알림 훅 자리 만들어 두기.
+- **작업 6 – 태스크 등록 & 큐 구성**: `ai_pipeline/tasks/__init__.py`에서 ETL 관련 태스크를 `ai_tasks` 큐로 라우팅하고, 향후 모델 태스크(`compute_risk`, `generate_recommendations`) 자리도 스텁 함수로 준비. `celery-beat` 스케줄은 파일(`jobs.yaml`)에 초안 작성.
+- **작업 7 – 검증 스크립트**: `scripts/chk_etl.py`에 Redis 연결, Celery 큐 길이, 샘플 API 호출 모의 실행이 통과하는지 확인하는 함수를 작성하고 `uv run python scripts/chk_etl.py`로 점검. MySQL·MinIO는 아직 실제 연결이 없으므로 더미 스토어(로그 출력)로 대체 후 추후 확장.
+- **의존성·결정 포인트**:
+  - Docker Compose 초안이 없으므로 Redis 외 다른 서비스는 로컬 프로세스로 먼저 돌린다. Compose 설계 시 `ai-worker`, `ai-beat`, `etl-worker` 세 컨테이너를 분리할 것을 전제.
+  - 한국투자증권 API 키는 아직 미정이라, ETL 태스크는 모의 응답(JSON 샘플)으로 테스트하고 실제 키 주입 전까지는 MinIO/MySQL 실제 쓰기는 비활성화 플래그로 묶는다.
+  - Slack/Email 알림은 Celery 시그널만 스텁 처리하고, 실제 통합은 네트워크 정책 협의 후 진행.
+
 ## AI 팀 작업 우선순위 (이 순서면 완주 가능)
 1. Python 환경/uv 설정 → Celery 기본 큐와 Redis 연결 구성.
 2. `open-trading-api` 기반 데이터 수집 태스크 작성 및 MySQL/MinIO 적재 파이프라인 구축.
