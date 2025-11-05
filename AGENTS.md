@@ -44,7 +44,8 @@
   - Networking: 단일 공인 IP와 Private Subnet을 관리해 HTTPS 게이트웨이를 노출하고 DB/Redis/MinIO를 내부망에 격리하며, 월 200GB 전송량과 보안그룹/TLS 정책을 점검합니다.
 
 ## 개발 스택 & 협업 규칙
-- Python 3.13 + `uv sync` 고정, Django REST Framework, Celery, Redis, MySQL 8.4, MinIO
+- Python 3.13 + `uv` 고정. 루트 `pyproject.toml`에 Django, DRF, Celery[redis], pandas, scikit-learn, MinIO, OpenAI SDK, `pymysql` 등이 기본 선언되어 있습니다.
+- `uv sync --no-cache`로 `.venv/`를 생성하고 필수 패키지를 설치합니다. MySQL C 드라이버가 필요하면 시스템 라이브러리를 준비한 뒤 `uv sync --extra db`를 실행해 `mysqlclient`를 추가하세요.
 - 프런트: Django 템플릿 → 필요 시 Vite+React/TypeScript, Chart.js 혹은 ECharts
 - 외부 LLM: ChatGPT API 사용, 프롬프트/응답 로깅은 민감 정보 마스킹 후 MinIO 저장
 - 코딩 컨벤션: `open-trading-api/docs/convention.md`(4-space, type hints, snake_case, 모듈 docstring)

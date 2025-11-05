@@ -52,6 +52,7 @@
   - Docker Compose 초안이 없으므로 Redis 외 다른 서비스는 로컬 프로세스로 먼저 돌린다. Compose 설계 시 `ai-worker`, `ai-beat`, `etl-worker` 세 컨테이너를 분리할 것을 전제.
   - 한국투자증권 API 키는 아직 미정이라, ETL 태스크는 모의 응답(JSON 샘플)으로 테스트하고 실제 키 주입 전까지는 MinIO/MySQL 실제 쓰기는 비활성화 플래그로 묶는다.
   - Slack/Email 알림은 Celery 시그널만 스텁 처리하고, 실제 통합은 네트워크 정책 협의 후 진행.
+  - 로컬 개발 단계에서는 빌드 의존성이 없는 `pymysql`을 기본 커넥터로 쓰되, 네이티브 드라이버(`mysqlclient`)는 `db` extra로 분리해 시스템 패키지 준비 후 선택적으로 설치한다.
 
 ## AI 팀 작업 우선순위 (이 순서면 완주 가능)
 1. Python 환경/uv 설정 → Celery 기본 큐와 Redis 연결 구성.

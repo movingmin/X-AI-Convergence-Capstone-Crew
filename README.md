@@ -21,6 +21,17 @@ AI 기반 보안 투자 최적화 시뮬레이터를 설계하는 프로젝트�
 - **AI & LLM**: ChatGPT API(비동기 호출, 토큰 로깅), 내부 추천 모델(위험 점수·대응 전략)
 - **Testing**: `chk_*.py` 실행 스크립트를 `uv run python <path>` 패턴으로 유지
 
+## Development Environment
+- **Python 버전**: `.python-version`은 3.13으로 고정되어 있습니다. `uv python install 3.13`으로 로컬 런타임을 준비하세요.
+- **초기 동기화**: 루트에서 `uv sync --no-cache`를 실행하면 `.venv/`가 생성되고 기본 패키지( Django, Celery, Redis, pandas, scikit-learn, MinIO, OpenAI SDK 등)가 설치됩니다.
+- **옵션 구성**: MySQL 네이티브 드라이버가 필요하면 시스템 라이브러리 설치 후 `uv sync --extra db`로 `mysqlclient`를 추가하세요. 기본 커넥터는 `pymysql`입니다.
+- **작업 예시**:
+  - 서버 실행: `uv run python manage.py runserver`
+  - 워커 실행: `uv run celery -A config worker -l info`
+  - 테스트: `uv run --extra tests pytest`
+  - 린트: `uv run --extra lint ruff check .`
+- **로컬 비밀**: `.env`나 `kis_devlp.yaml`에서 `REDIS_URL`, DB 접속 정보, OpenAI Key 등을 관리하고 Git에 추가하지 않습니다. `.env.example`은 추후 업데이트 예정입니다.
+
 ## Repository Layout
 ```text
 .
