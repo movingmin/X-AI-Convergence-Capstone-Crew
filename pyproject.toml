@@ -1,0 +1,38 @@
+[project]
+name = "xai-capstone"
+version = "0.1.0"
+description = "AI 기반 보안 투자 최적화 시뮬레이터"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "django==5.*",
+    "djangorestframework>=3.15",
+    "drf-spectacular>=0.27",
+    "django-environ>=0.11",
+    "celery[redis]>=5.4",
+    "redis>=5.0",
+    "pymysql>=1.1",
+    "pandas>=2.3",
+    "numpy>=2.0",
+    "scikit-learn>=1.5",
+    "minio>=7.2",
+    "tenacity>=9.0",
+    "pydantic-settings>=2.5",
+    "structlog>=24.1",
+    "openai>=1.51",
+]
+
+[project.optional-dependencies]
+api = ["gunicorn>=23.0"]
+worker = ["flower>=2.0"]
+etl = ["duckdb>=1.1.0"]
+tests = ["pytest>=8.3", "pytest-django>=4.8", "pytest-celery>=1.0", "factory-boy>=3.3"]
+lint = ["ruff>=0.6"]
+db = ["mysqlclient>=2.2"]
+
+[build-system]
+requires = ["uv_build>=0.9.7,<0.10.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = ["ipython>=8.26", "rich>=13.9"]
