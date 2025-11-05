@@ -1,0 +1,80 @@
+장고 프로젝트 기본 설계
+=======================
+
+1. 프로젝트 디렉터리 개요
+-----------------------
+```
+src/
+├── core/                         # 장고 프로젝트 뼈대: 설정, URL, ASGI/WSGI, Celery 초기화
+│   ├── settings/
+│   │   ├── __init__.py
+│   │   ├── base.py               # 공통 설정(앱, 미들웨어, REST 프레임워크, Celery, 로깅)
+│   │   ├── dev.py                # 개발 환경 전용 옵션
+│   │   └── prod.py               # 운영 환경 보안·로깅 강화 설정
+│   ├── urls.py                   # API, 관리자, 헬스체크 경로 연결
+│   ├── asgi.py                   # Channels 연계를 염두에 둔 ASGI 진입점
+│   ├── wsgi.py
+│   └── celery.py                 # Celery 앱 객체와 스케줄, 태스크 자동 로드 구성
+├── apps/
+│   ├── accounts/                 # 인증, 역할/권한, 다중 인증, 세션 추적
+│   ├── scenarios/                # 시나리오 CRUD, 버전 관리, 입력 파라미터 스키마
+│   ├── portfolios/               # 모의 계좌·포지션·현금 흐름 저장소 /현재 여기까지만 만듬r
+│   ├── simulator/                # 주문/체결 처리, 백테스트, 성과 계산
+│   ├── risk/                     # 위협 감지, 위험 점수, 대응 규칙
+│   ├── ai_recommendations/       # AI 추천 모델, 설명 생성, 결과 캐시
+│   ├── etl/                      # 한국투자 API·뉴스·재무 데이터 수집/적재
+│   ├── integrations/             # 외부 연동 공통 모듈(KIS, 뉴스, LLM 등)
+│   ├── monitoring/               # 헬스체크, 감사 로그, 사용량 지표
+│   └── common/                   # 공통 유틸, 베이스 모델, 상수 정의
+└── manage.py
+```
+
+2. 앱별 책임
+-----------
+- `accounts`: 커스텀 유저 모델과 역할 기반 접근 제어, 다중 인증 등록, 로그인·세션 이력 저장. `/auth/` API와 세션 정리, 이상 징후 탐지를 위한 비동기 작업을 제공.
+- `scenarios`: 투자·보안 시나리오 작성, 버전 관리, JSON 스키마 기반 파라미터 검증. 사용자/팀과 연결되며 시뮬레이터·위협 대응 모듈에 이벤트를 전달.
+- `portfolios`: 모의 계좌 상태, 보유 자산, 거래 기록을 보관해 시나리오와 시뮬레이터 사이 데이터 허브 역할.
+- `simulator`: 모의 주문 실행과 체결 기록, 성과 지표 산출을 담당. Celery 작업으로 시뮬레이션을 실행하고 결과를 `portfolios`에 반영.
+- `risk`: 위협 대응 규칙과 점수 산정, 경보 발행을 수행. 모니터링 모듈과 연동해 인시던트를 저장하고 추천 결과를 보완.
+- `ai_recommendations`: 모델 메타데이터와 추천 로직을 관리하고, 설명 텍스트 생성을 위해 외부 LLM 호출을 보조. 응답과 모델 산출물은 MinIO에 저장.
+- `etl`: `open-trading-api` 기반 시장 데이터, 뉴스·재무 정보 수집과 정제·적재를 자동화. 데이터 최신성을 모니터링에 제공.
+- `integrations`: 외부 API 클라이언트와 웹훅, 자격 증명 회전 로직을 중앙에서 관리해 다른 앱이 재사용.
+- `monitoring`: `/health/`, `/metrics/` 등 서비스 상태 엔드포인트, 감사 로그, 토큰 사용량 집계, Prometheus와의 연계를 제공.
+- `common`: 타임스탬프, 소프트 삭제 등 공통 추상 모델과 시리얼라이저 유틸, 도메인 상수·열거형을 정의.
+
+3. 공통 설계 원칙
+----------------
+- 데이터베이스: 각 앱이 모델·마이그레이션을 관리하되 `common.models.TimeStampedModel`을 상속해 일관성을 확보. Django 시그널은 최소화하고 `services.py`에서 명시적으로 업무 로직을 처리.
+- API 계층: 앱별로 DRF ViewSet을 구성하고 `core/urls.py`에서 `/api/v1/<app>/` 형태로 라우팅. `/admin/`, `/auth/`, `/metrics` 등 공통 엔드포인트도 함께 연결.
+- 권한 체계: `accounts.permissions`에 DRF 권한 클래스를 모아두고, DB에 저장된 역할 정보를 캐시. 세션 기반 인증과 JWT를 병행해 내부·외부 접근을 분리.
+- 시리얼라이저: 앱마다 `serializers.py`를 두되 복잡한 조합 로직은 서비스 계층으로 이동시켜 시리얼라이저는 검증과 변환에 집중.
+- OpenAPI 문서: DRF Spectacular을 기본으로 `/api/schema/`와 문서 UI(Swagger, Redoc)를 자동 노출.
+
+4. Celery 큐와 스케줄
+-------------------
+- `core/celery.py`에서 Celery 앱을 초기화하고, 각 앱의 `tasks.py`를 자동 검색하도록 설정.
+- 주요 큐 구성
+  - `etl`: `fetch_market_data`, `ingest_financials`와 같은 데이터 수집·적재 작업
+  - `simulation`: `run_backtest`, `replay_orders` 등 시뮬레이션 업무
+  - `risk`: `evaluate_alerts`, `notify_incident` 등 위험 분석·알림
+  - `ai`: `generate_signal`, `explain_recommendation` 등 추천·설명 생성
+- Beat 스케줄 예시
+  - 분·5분 단위 시장 데이터 갱신
+  - 일별 위험 점검과 토큰 사용량 통계
+  - 주간 모델 점검, MinIO 정리 작업
+
+5. 데이터 흐름 핵심 단계
+----------------------
+1. `etl` 앱이 `integrations.kis`를 통해 시세·뉴스 데이터를 가져오고, 원본은 MinIO에, 정제된 데이터는 MySQL에 저장.
+2. `simulator` 앱이 시나리오 입력과 데이터 스냅샷을 받아 시뮬레이션을 돌리고 결과를 `portfolios` 모델에 기록.
+3. `ai_recommendations` 앱이 최신 포트폴리오 상태로 추천 신호를 만들고, 필요하면 외부 LLM에 설명 생성을 요청해 MinIO에 보관.
+4. `risk` 앱이 시뮬레이터와 추천 결과를 분석해 위협 대응 규칙을 적용하고 경보·알림을 남김.
+5. `monitoring` 앱이 Celery 태스크 상태, API 지연 등을 수집해 Compose 모니터링 스택(Prometheus, Grafana 등)에 제공.
+
+6. 우선 구현 순서
+----------------
+1. `django-admin startproject core src`로 프로젝트를 만들고 `pyproject.toml`에 `apps.<앱이름>` 경로를 등록.
+2. `accounts` 앱에서 커스텀 유저 모델, 기본 역할 데이터, 인증 백엔드를 구성.
+3. `core.settings.base`에 DRF와 Spectacular을 추가하고 `core.urls`에 앱 라우터·공용 엔드포인트를 연결.
+4. Celery와 Redis 브로커, `.env` 비밀 키 로딩 구조를 설정해 비동기 작업 환경을 마련.
+5. `scenarios`, `portfolios` 앱에 최소 모델·시리얼라이저·ViewSet을 구현해 시뮬레이터 연동 기반을 확보.
