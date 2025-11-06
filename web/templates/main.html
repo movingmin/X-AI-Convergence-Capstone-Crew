@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko"> <!--문서의 언어를 한국어로 설정-->
+<head>
+  <meta charset="UTF-8"> <!--문서의 문자 인코딩을 UTF-8로 설정(한글, 특수문자 깨짐 방지)-->
+  <title>이분할 화면 템플릿</title> <!--브라우저 탭에 표시될 제목-->
+  <style> /* 전체 문서(body)에 대한 기본 스타일 설정*/
+    body {
+      margin: 0; /* 기본 여백 제거 */
+      height: 100vh; /* 뷰포트 높이 전체 사용(viewport height=100%) */
+      display: flex; /* 플렉스 박스 레이아웃 사용(내부 요소 가로 정렬) */
+    }
+    /* 왼쪽, 오른쪽 영역 공동으로 스타일 */
+    .left, .right {
+      flex: 1; /* 두 영역이 동일한 너비를 가지도록 설정 (1:1 비율)*/
+      display: flex;  /* 내부 요소 중앙 정렬을 위한 플렉스 박스 사용 */
+      flex-direction: column; /* 세로 방향 정렬 */
+      justify-content: space-between; /* 위 아래로 분리 */
+      align-items: center; /* 세로 중앙 정렬 */
+      font-size: 24px; /* 글자 크기 설정 */
+    }
+    .divider {
+      width: 4px; /* 구분선 너비 설정 */
+      background-color: #black; /* 구분색 : 검정색 */
+    }
+
+    .input-container {
+      width: 90%; /* 입력창 너비 설정 */
+      padding: 10px; /* 입력창 안쪽 여백 설정 */
+      margin-bottom: 20px; /* 아래쪽 여백 설정 */
+      display: flex; /* 플렉스 박스 레이아웃 사용 */
+      justify-content: center; /* 중앙 정렬 */
+    }
+
+    input[type="text"] {
+      width: 100%; /* 입력창 너비 100% */
+      padding: 10px; /* 입력창 안쪽 여백 설정 */
+      font-size: 16px; /* 글자 크기 설정 */
+      border: 1px solid #8b8888; /* black */
+      border-radius: 9999px; /* 테두리 둥글게 설정 */
+      outline:none; /* 포커스 시 외곽선 제거 */
+      transition: 0.2s ease; /* 포커스 시 부드러운 전환 효과 */
+    }
+
+    input[type="text"]:focus {
+      border-color: #555; /* 포커스 시 테두리 색상 변경 */
+    }
+
+    .left {
+      background-color: #f0f0f0;
+    }
+    .right {
+      background-color: #f9fafc;
+    }
+  </style>
+</head>
+<body>
+    <!-- 왼쪽 절반 화면 -->
+  <div class="left">
+  <div>왼쪽영역</div>
+  <div class="input-container">
+    <input type="text", id="inputBox" placeholder="여기에 입력하세요">
+    <button id="rightButton">눌러보세요</button>
+    <!-- 오른쪽 절반 화면 --> 
+    </div>
+</div>
+
+  <div class="right">
+    <div>오른쪽영역</div>
+    </div>
+<div>
+
+  <script>
+    
+    document.getElementById("inputBox").addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault(); // 기본 동작 방지 (폼 제출 등)
+        alert("엔터키 입력");
+      }
+    });
+
+    document.getElementById("rightButton").addEventListener("click", function() {
+      const value = document.getElementById("inputBox").value;
+      alert("버튼 클릭됨! 입력값: " + value);
+    });
+  </script>
+</body>
+</html>
