@@ -4,10 +4,19 @@
  - /KIS/config/pyproect.toml 기준으로 uv로 파이썬 가상환경 설정, 의존성 패키지 설치
  - /KIS/config/자동매매/ 디렉터리는 KIS 토큰 할당받아 보기 위한 테스트 디렉터리
  - **/.env 파일에 환경 변수(KIS key, 가상계좌번호, openai api key, TR_ID 등) 등록**
- - **KIS/config/openai_kis_connect/ 디렉터리에 툴 및 주요 호출 API 코딩**
+ - **KIS/config/openai_kis_connect/ 디렉터리에 설정 파일 및 kis 토큰 발급 파일(메모리 캐싱 방식), LLM 호출 파일 작성(히스토리 남기는 ask_with_history 함수도 추가)**
+ - **KIS/config/openai_kis_connect/tools/에 툴 및 주요 호출 API 코딩**
     - openai_call.py: KIS app key, app secret을 통해 KIS 토큰 할당 및 openai 채팅 기능 구현(테스트 필요) *37번라인 하드코딩된것인지 확인해보고 수정필요*
     - get_price.py: 단일 시세 조회 api 툴
         - 시가총액 상위 1000개의 기업 크롤링(crolling.py)
         - 기업명, 종목 코드, 시장 구분 코드(유가증권, 코스닥 등) 나열된 데이터셋을 json파일로 제작(market_code.json)
         - LLM에게 입력된 데이터의 기업명을 통해 종목 코드를 뽑아서 get_price.py:36,37에 입력 예정
-        
+ - **다음에 해 볼 것**
+    - LLM 함수 호출 및 kis_auth를 통한 키 발급 시도
+    - market_code.json을 보고 llm이 필요 시에 필요 툴을 호출할 수 있게 하기
+        - 툴/함수 정의(OpenAI Function 호출 정의 참고)
+        - LLM이 해당 market_code.json 을 참고하게 연결(Python 앱 내에서 딕셔너리로 로딩)
+        - 종목명 → 코드/시장 구하는 resolve_code(name) 함수 정의
+        - OpenAI Function에 resolve_code(name) 함수 연결
+        - LLM이 get_price(code, market) 호출을 할 수 있도록 구성(get_price 함수도 입력 인자를 받도록 수정해야할듯)
+    - 이후 다음 툴 만들어 보기
