@@ -16,6 +16,7 @@
 - `mdfiles/server.md`: 확정된 서버 구성 및 현재 운영 예산
 - `mdfiles/serverfeedback.md`: 서버 구성 제안·비용 절감 피드백 기록
 - `mdfiles/docker-compose.md`, `mdfiles/feedback.md`: 필요 시 생성해 Compose 설계 또는 일반 피드백 기록
+- `mdfiles/work.md`: 개인 별 작업 일지. 작성자는 따로 관리하며, 에이전트는 열람만 하고 수정하지 않는다.
 - 로컬 비밀 문서: `mdfiles/open-trading-api.md`는 `.gitignore`에 포함되어 있으며, API 키·시크릿은 여기에 기록하지 말고 `.env` 혹은 `kis_devlp.yaml`에서 환경 변수로 관리
 
 ## 문서 편집 규칙
@@ -33,6 +34,9 @@
 - **AI & 데이터 팀** (`mdfiles/AIfeedback.md` 참고)
   - Celery 워커/비트, Redis, ETL 파이프라인(`open-trading-api` 래핑) 설계
   - 위험 점수·추천 모델, LLM 호출, MinIO 버킷 구조(`reports`, `models`, `prompts`) 운영
+  - `KIS/config/openai_kis_connect/`의 KIS 토큰 캐싱·발급 로직과 `ask_with_history` 기반 LLM 인터페이스, Function 호출용 툴 모듈(`tools/`)을 유지하고 테스트한다.
+  - `tools/openai_call.py`의 하드코딩 여부(37번째 줄) 검토 및 환경 변수와 `.env`에 위임했는지 확인하며, `get_price.py`·`crolling.py`·`market_code.json`을 통해 종목 코드 해석과 시세 조회 플로우를 검증한다.
+  - `market_code.json`을 애플리케이션에서 로딩해 종목명→코드/시장 변환 함수(`resolve_code`)와 `get_price` Function 호출 흐름을 완성하고, LLM이 필요한 툴을 선택적으로 호출하는지 확인한다.
   - `chk_ai.py`, `chk_etl.py`, `chk_llm.py` 테스트 지표 유지 및 주간 품질 리포트 작성
   - 토큰 사용량·오류 모니터링, 실패 재시도/폴백 전략, 모델 버전 관리 문서화
 - **공통 운영** (`mdfiles/serverinit.md`, `mdfiles/server.md`, `mdfiles/serverfeedback.md` 참고)
@@ -45,6 +49,7 @@
 
 ## 개발 스택 & 협업 규칙
 - Python 3.13 + `uv` 고정. 루트 `pyproject.toml`에 Django, DRF, Celery[redis], pandas, scikit-learn, MinIO, OpenAI SDK, `pymysql` 등이 기본 선언되어 있습니다.
+- `KIS/config/pyproject.toml` 기준으로 별도 가상환경을 `uv sync --no-cache`로 구성해 KIS API·LLM 연동 도구를 실행하며, 필수 비밀 값은 `.env`에만 저장한다.
 - `uv sync --no-cache`로 `.venv/`를 생성하고 필수 패키지를 설치합니다. MySQL C 드라이버가 필요하면 시스템 라이브러리를 준비한 뒤 `uv sync --extra db`를 실행해 `mysqlclient`를 추가하세요.
 - 프런트: Django 템플릿 → 필요 시 Vite+React/TypeScript, Chart.js 혹은 ECharts
 - 외부 LLM: ChatGPT API 사용, 프롬프트/응답 로깅은 민감 정보 마스킹 후 MinIO 저장
