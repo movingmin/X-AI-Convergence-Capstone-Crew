@@ -209,3 +209,5 @@ mdfiles/open-trading-api.md
 활동일지/
 .venv/
 uv.lock
+.env
+KIS/config/자동매매/
