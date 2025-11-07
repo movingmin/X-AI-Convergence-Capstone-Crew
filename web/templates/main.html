@@ -46,17 +46,17 @@
     }
 
     #rightButton {
-      width: 45px;
-      height: 45px;
-      border: none;
+      width: 45px; /*버튼 크기*/
+      height: 45px; 
+      border: none; /* 기본 버튼 테두리 제거 */
       border-radius: 50%; /* 동그랗게 */
       background-color: black; /* 원형 배경 */
-      display: flex;
+      display: flex; /* 이미지 중앙 배치 */
       align-items: center;
       justify-content: center;
       font-size: 20px;
-      cursor: pointer;
-      transition: background-color 0.2s ease, transform 0.2s ease;
+      cursor: pointer; /* 마우스 올리면 손모양 */
+      transition: background-color 0.2s ease, transform 0.2s ease; /* hover 효과 */
     }
 
     #rightButton:hover {
@@ -65,16 +65,16 @@
     }
 
     #rightButton img {
-      width: 20px;
+      width: 20px; /* 아이콘 크기 */
       height: 20px;
 
     }
 
     .left {
-      background-color: #f0f0f0;
+      background-color: #f0f0f0; /* 왼쪽 영역 배경색 */
     }
-    .right {
-      background-color: #f9fafc;
+    .right { 
+      background-color: #f9fafc; /* 오른쪽 영역 배경색 */
     }
   </style>
 </head>
@@ -82,10 +82,10 @@
     <!-- 왼쪽 절반 화면 -->
   <div class="left">
   <div>왼쪽영역</div>
-  <div class="input-container">
-    <input type="text", id="inputBox" placeholder="여기에 입력하세요">
-    <button id="rightButton">
-      <img src="arrows.png" alt="전송 아이콘">
+  <div class="input-container"> <!-- 입력창 + 버튼 묶음 -->
+    <input type="text", id="inputBox" placeholder="여기에 입력하세요"> <!-- 텍스트 입력 창 -->
+    <button id="rightButton"> <!-- 전송 버튼 -->
+      <img src="arrows.png" alt="전송 아이콘"> <!-- 버튼 내부 아이콘 -->
     </button>
     <!-- 오른쪽 절반 화면 --> 
     </div>
@@ -97,17 +97,17 @@
 <div>
 
   <script>
-    
+     /* 입력창에서 Enter키 눌렀을 때 실행되는 이벤트 */
     document.getElementById("inputBox").addEventListener("keypress", function(event) {
-      if (event.key === "Enter") {
+      if (event.key === "Enter") { // 엔터키 감지
         event.preventDefault(); // 기본 동작 방지 (폼 제출 등)
-        alert("엔터키 입력");
+        alert("엔터키 입력"); // 알림창 출력
       }
     });
 
     document.getElementById("rightButton").addEventListener("click", function() {
-      const value = document.getElementById("inputBox").value;
-      alert("버튼 클릭됨! 입력값: " + value);
+      const value = document.getElementById("inputBox").value; // 입력값 가져오기
+      alert("버튼 클릭됨! 입력값: " + value); // 알림창 출력
     });
   </script>
 </body>
