@@ -7,7 +7,6 @@ from ..config import KIS_BASE
 TR_ID = os.getenv("TR_ID_PRICE") # 단일 시세 조회 tr_id
 url=f"{KIS_BASE}/uapi/domestic-stock/v1/quotations/inquire-price"
 
-
 def get_price(token: str, appkey: str, appsecret: str, code: str = "005930", market_div_code: str = "J") -> Dict[str, Any]:
     """
     한국투자증권(KIS) MCP 현재가 조회 API를 호출해 응답 JSON을 반환한다.
